@@ -1,87 +1,119 @@
-/** 
- * autoLoadNextPage 滚屏自动加载下一页 
- * @param  {string} url  返回JSON数据的地址
- * @param  {string} ul   容器的选择器关键字
- * @param  {string} more '更多'按钮的选择器关键字
- * 2012.09.22 @yelo
- * e.g. : 
- *      javascript (main) : 
- *          var autoLoad = new autoLoadNextPage({:U('w3g/Message/load')}&type={$_REQUEST['type']}&{:C('VAR_PAGE')}=, "ul#msgUl", "nav#more").updateList().bindBottom(); 
- *          $(dataMore).live('click',function(){autoLoad.updateList()});    // 为'更多'按钮绑定动作
- *      html (main) :
- *      	...<ul id="msgUl"></ul><nav id="more"><a href="#">更多</a></nav>...
- *      JSON :
- *      	{html: "<li>...</li>...<li>....</li>", nextpage: 2}
- *      
- */
-function autoLoadNextPage(url, ul, more){
-    this.__url = url;
-    this.__ul = ul;
-    this.__more = more;
-    this.__nextpage = 1;
-    this.__running = false;  //防止在未返回结果时重复ajax
+define(function (require, exports, module) {
+  // helper
+  var helper = {};
+  helper.nop = function () {};
+  helper.origin = function () {};
 
-    // 默认以jqm的PageLoadingMsg提示正在加载
-    this.__beforeUpdate =function(){
-        $.mobile.showPageLoadingMsg();
-    }
-    this.__afterUpdate = function(){
-        $.mobile.hidePageLoadingMsg();
-    }
+  /**
+   * 页尾自动加载下一页
+   */
+  var TailLoader = function (url, container, button, render, dataParser) {
+    this._url = url;
+    this._container = container;
+    this._button = button;
+    this._nextPage = 2;
+    this._totalPages = 0;
+    this._flag = {
+      requesting: false, //防止在未返回结果时重复ajax
+      noMore: false, // 结束标记
+    };
+    this._render = render || helper.origin;
+    this._dataParser = dataParser || helper.origin;
+    this._beforeUpdate = helper.nop;
+    this._afterUpdate = helper.nop;
+    this._afterRender = helper.nop;
+    return this;
+  };
 
-    /**
-     * 设置加载内容前的动作
-     * @param {function}beforeUpdate
-     */
-    this.setBeforeUpdate = function(beforeUpdate){
-        this.__beforeUpdate = beforeUpdate;
-        return this;
-    }
-    /**
-     * 设置加载内容后的动作
-     * @param {function}beforeUpdate
-     */
-    this.setAfterUpdate = function(afterUpdate){
-        this.__afterUpdate = afterUpdate;
-        return this;
-    }
+  /**
+   * 设置加载内容前的动作
+   * @param {function}beforeUpdate
+   */
+  TailLoader.prototype.setBeforeUpdate = function (beforeUpdate) {
+    this._beforeUpdate = beforeUpdate;
+    return this;
+  };
+  /**
+   * 设置加载内容后的动作
+   * @param {function}beforeUpdate
+   */
+  TailLoader.prototype.setAfterUpdate = function (afterUpdate) {
+    this._afterUpdate = afterUpdate;
+    return this;
+  };
+  /**
+   * 设置解析模板后的动作
+   * @param {function}beforeUpdate
+   */
+  TailLoader.prototype.setAfterRender = function (afterRender) {
+    this._afterRender = afterRender;
+    return this;
+  };
 
-    /**
-     * updateList 加载数据
-     * @param  {int} p 页码,置空时自动取nextpage
-     */
-    this.updateList = function(p){
-        obj = this;
-        p = p ? p : obj.__nextpage;
-        if(p){
-            obj.__beforeUpdate();
-            if(!obj.__running){
-                $.get( obj.__url + p, function(data){
-                    $(obj.__ul).append( data.html );
-                    if(data.nextpage==0){
-                        $(obj.__more).remove();
-                    }
-                    obj.__nextpage = data.nextpage;
-                    obj.__running = false;
-                    obj.__afterUpdate();
-                }, "json");
+  /**
+   * update 加载数据
+   * @param  {int} p 页码,置空时自动取nextPage
+   */
+  TailLoader.prototype.update = function (page) {
+    var self = this;
+    var url;
+    page = typeof page === 'undefined' ? self._nextPage : page;
+    if (typeof self._url === 'string') {
+      url = self._url + page;
+    } else if (typeof self._url === 'function') {
+      url = self._url(page);
+    } else {
+      throw new Error('base url must be a function or a string');
+    }
+    if (!self._flag.noMore) {
+      self._beforeUpdate();
+      if (!self._flag.requesting) {
+        $.ajax({
+          type: 'get',
+          url: url,
+          success: function (data) {
+            var $row;
+            var i, len;
+            data = self._dataParser(data);
+            if (data.data) {
+              for (i = 0, len = data.data.length; i < len; i++) {
+                $row = $(self._render(data.data[i])).appendTo(self._container);
+                self._afterRender.apply($row);
+              }
             }
-            obj.__running = true;
-        }
-        return this;
-    }
-
-    /**
-     * 滚至底部时触发加载动作
-     */
-    this.bindBottom = function(){
-        pointer = this;
-        $(window).bind("scroll", function(){
-            if( $(document).scrollTop() + $(window).height() > $(document).height() - 10 ) {
-                pointer.updateList();
+            self._totalPages = data.totalPages;
+            if (self._totalPages <= self._nextPage) {
+              $(self._button).hide();
+              self._flag.noMore = true;
+            } else {
+              self._nextPage++;
             }
+            self._flag.requesting = false;
+            self._afterUpdate();
+          },
+          error: function (err) {
+            throw err;
+          },
+          dataType: "json"
         });
-        $.mobile.ajaxEnabled=false; //强制chrome重置页面
-        return this;
+      }
+      self._flag.requesting = true;
     }
-}
+    return this;
+  };
+
+  /**
+   * 滚至底部时触发加载动作
+   */
+  TailLoader.prototype.bindBottom = function () {
+    var self = this;
+    $(window).bind("scroll", function() {
+      if ($(document).scrollTop() + $(window).height() > $(document).height() - 800) {
+        self.update();
+      }
+    });
+  };
+
+  module.exports = TailLoader;
+
+});
