@@ -26,8 +26,6 @@ define(['TailLoader'], function (TailLoader) {
       // 否则tailLoader将被锁住不再响应页尾事件
     }
   });
-  // 手动绑定页尾事件
-  tailLoader.bindBottom();
 });
 ```
 
@@ -69,7 +67,7 @@ define(['TailLoader'], function (TailLoader) {
         ALERT('this is the last page');
       }
     }
-  }).bindBottom(); // 链式手动绑定页尾事件
+  });
 });
 ```
 
@@ -116,6 +114,7 @@ define(['TailLoader'], function (TailLoader) {
    * @author yelo
    * @constructor
    * @param {object} options 与$.ajax参数一致，但其中complete, error, success的上下文为TailLoader实例
+   * @param {boolean} [isBindBottom=true] 自动绑定页尾事件
    * @chainable
    */
   /**
