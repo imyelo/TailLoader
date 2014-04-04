@@ -1,7 +1,7 @@
 {
   "name": "tail-loader",
   "description": "页尾自动加载",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "yelo",
   "repository": {
     "type": "git",

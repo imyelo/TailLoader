@@ -22,8 +22,11 @@ define(['TailLoader'], function (TailLoader) {
       if (this.data('page') < TOTAL) {
         // 还存在下一页时为tailLoader解锁，使其可以继续获取数据
         this.unlock();
+      } else{
+        // 否则tailLoader将被锁住不再响应页尾事件
+        // 解绑页尾事件，释放资源
+        this.unbind();
       }
-      // 否则tailLoader将被锁住不再响应页尾事件
     }
   });
 });
@@ -65,6 +68,8 @@ define(['TailLoader'], function (TailLoader) {
       } else {
         // 向用户告知已经是最后一页
         ALERT('this is the last page');
+        // 解绑页尾事件，释放资源
+        this.unbind();
       }
     }
   });
@@ -100,6 +105,7 @@ define(['TailLoader'], function (TailLoader) {
         this.unlock();
       } else {
         ALERT('this is the last page');
+        this.unbind();
       }
     }
   });
@@ -188,7 +194,7 @@ this
 
 
 #### TailLoader.bindBottom()
-绑定页尾事件(如不经jQuery.tailLoader生成则需要手动执行)
+手动绑定页尾事件
 
 
 #### TailLoader.onscroll()
