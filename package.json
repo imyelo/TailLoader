@@ -1,0 +1,11 @@
+{
+  "name": "tail-loader",
+  "description": "页尾自动加载",
+  "version": "1.0.0",
+  "author": "yelo",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/imyelo/TailLoader"
+  },
+  "license": "MIT"
+}
