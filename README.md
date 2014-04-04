@@ -107,80 +107,97 @@ define(['TailLoader'], function (TailLoader) {
 ```
 
 ## API
-```
-  /**
-   * 尾加载
-   * @class TailLoader
-   * @author yelo
-   * @constructor
-   * @param {object} options 与$.ajax参数一致，但其中complete, error, success的上下文为TailLoader实例
-   * @param {boolean} [isBindBottom=true] 自动绑定页尾事件
-   * @chainable
-   */
-  /**
-   * 获取数据(可手动执行)
-   * @method fetch
-   * @for TailLoader
-   * @chainable
-   */
-  /**
-   * 获取某项data(发送到服务器的数据)
-   * @method data
-   * @for TailLoader
-   * @param  {string} key   键名
-   * @return 对应值
-   */
-  /**
-   * 设置某项data(发送到服务器的数据)
-   * @method data
-   * @for TailLoader
-   * @chainable
-   * @param  {string} key   键名
-   * @param {object} value 值
-   * @return this
-   */
-  /**
-   * 使data中某一值自增
-   * @method inc
-   * @for TailLoader
-   * @param  {string} key  键名
-   * @param  {number} [step=1] 增量
-   * @return 自增后的值
-   */
-  /**
-   * 使data中某一值自减
-   * @method dec
-   * @for TailLoader
-   * @param  {string} key  键名
-   * @param  {number} [step=1] 减量
-   * @return 自减后的值
-   */
-  /**
-   * 解锁
-   * @method unlock
-   * @for TailLoader
-   * @chainable
-   * @return this}
-   */
-  /**
-   * 绑定页尾事件(如不经jQuery.tailLoader生成则需要手动执行)
-   * @method bindBottom
-   * @for TailLoader
-   * @chainable
-   */
-  /**
-   * 响应页面滚动事件的方法，通过bindBottom方法自动生成
-   * @method onscroll
-   * @for TailLoader
-   * @private
-   */
-  /**
-   * 解绑页尾事件
-   * @method unbind
-   * @for TailLoader
-   * @chainbale
-   */
-```
+### $.tailLoader(options, \[bindBottom\])
+尾加载 for jQuery
+
+
+**Parameters**
+
+**options**:  *object*,  
+
+
+**[bindBottom]**:  *boolean*,  自动绑定尾部事件
+
+**Returns**
+
+*TailLoader*,  loader
+
+### class TailLoader
+**Methods**
+
+#### TailLoader.fetch()
+获取数据(可手动执行)
+
+
+#### TailLoader.data(key)
+获取某项data(发送到服务器的数据)
+
+
+**Parameters**
+
+**key**:  *string*,  键名
+
+**Returns**
+
+对应值
+
+#### TailLoader.data(key, value)
+设置某项data(发送到服务器的数据)
+
+
+**Parameters**
+
+**key**:  *string*,  键名
+
+**value**:  *object*,  值
+
+**Returns**
+
+this
+
+#### TailLoader.inc(key, \[step=1\])
+使data中某一值自增
+
+
+**Parameters**
+
+**key**:  *string*,  键名
+
+**[step=1]**:  *number*,  增量
+
+**Returns**
+
+自增后的值
+
+#### TailLoader.dec(key, \[step=1\])
+使data中某一值自减
+
+
+**Parameters**
+
+**key**:  *string*,  键名
+
+**[step=1]**:  *number*,  减量
+
+**Returns**
+
+自减后的值
+
+#### TailLoader.unlock()
+解锁
+
+
+#### TailLoader.bindBottom()
+绑定页尾事件(如不经jQuery.tailLoader生成则需要手动执行)
+
+
+#### TailLoader.onscroll()
+响应页面滚动事件的方法，通过bindBottom方法自动生成
+
+
+#### TailLoader.unbind()
+解绑页尾事件
+
 
 ## License 
 MIT
