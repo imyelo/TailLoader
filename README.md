@@ -78,10 +78,8 @@ define(['TailLoader'], function (TailLoader) {
 
 ## jQuery
 你同样可以通过jQuery.tailLoader调用TailLoader。
-*注： 通过jQuery.tailLoader方法实现的尾加载将自动调用bindBottom方法。*
 ```
 define(['TailLoader'], function (TailLoader) {
-  // $.tailLoader默认自动绑定页尾事件
   $.tailLoader({
     url: 'http://foobar.com/api',
     data: {
